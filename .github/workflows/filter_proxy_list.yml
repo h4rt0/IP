@@ -1,0 +1,38 @@
+name: Filter Proxy List
+
+on:
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  filter-file:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Download Proxy List
+      run: |
+        curl -L -o proxyList.txt https://raw.githubusercontent.com/FoolVPN-ID/Nautica/e39dff1ec82e0f7e884fe9e127dc60b26dff8a3d/proxyList.txt
+
+    - name: Filter Lines Containing ",ID,"
+      run: |
+        grep ",ID," proxyList.txt > filtered_proxyList.txt
+
+    - name: Save Filtered File
+      run: |
+        mv filtered_proxyList.txt filtered_output/proxyList.txt
+      env:
+        OUTPUT_DIR: ./filtered_output
+
+    - name: Commit and Push Filtered File
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        mkdir -p filtered_output
+        mv filtered_proxyList.txt filtered_output/proxyList.txt
+        git add filtered_output/proxyList.txt
+        git commit -m "Add filtered proxy list"
+        git push

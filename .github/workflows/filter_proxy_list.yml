@@ -19,11 +19,13 @@ jobs:
       run: |
         grep ",ID," proxyList.txt > filtered_proxyList.txt
 
+    - name: Create Output Directory
+      run: |
+        mkdir -p filtered_output
+
     - name: Save Filtered File
       run: |
         mv filtered_proxyList.txt filtered_output/proxyList.txt
-      env:
-        OUTPUT_DIR: ./filtered_output
 
     - name: Commit and Push Filtered File
       env:
@@ -31,8 +33,6 @@ jobs:
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "actions@github.com"
-        mkdir -p filtered_output
-        mv filtered_proxyList.txt filtered_output/proxyList.txt
         git add filtered_output/proxyList.txt
         git commit -m "Add filtered proxy list"
         git push
